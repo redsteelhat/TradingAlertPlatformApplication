@@ -3,6 +3,8 @@ package com.reveriex.TradingAlertPlatform.Services;
 import com.reveriex.TradingAlertPlatform.Entity.User;
 import com.reveriex.TradingAlertPlatform.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -43,5 +45,13 @@ public class UserService implements UserDetailsService {
                 .password(user.getPassword())
                 .roles("USER") // Kullanıcı rolünü ayarlayın
                 .build();
+    }
+
+    public String getLoggedInUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            return authentication.getName(); // Oturum açmış kullanıcının adı
+        }
+        return null; // Kullanıcı oturum açmamışsa null döner
     }
 }

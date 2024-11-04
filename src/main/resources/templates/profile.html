@@ -1,10 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Profile Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-
+<div class="container mt-5">
+    <div class="card mx-auto" style="width: 22rem;">
+        <img th:src="${profilePicture}" class="card-img-top rounded-circle mx-auto mt-3" alt="Profile Picture" style="width: 150px; height: 150px;">
+        <div class="card-body text-center">
+            <h3 class="card-title" th:text="${username}">Kullanıcı Adı</h3>
+            <p class="card-text">Bu, kullanıcı profil sayfasıdır. Burada profil bilgilerinizi görüntüleyebilir ve güncelleyebilirsiniz.</p>
+            <div class="btn-group mt-3" role="group">
+                <a href="/settings" class="btn btn-secondary">Ayarlar</a>
+                <a href="/binance/account" class="btn btn-primary">Binance Hesabı</a>
+            </div>
+            <div class="mt-4">
+                <h5>İstatistikler</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Toplam İşlem Sayısı: <span>120</span></li>
+                    <li class="list-group-item">Kazanç: <span>$5300</span></li>
+                    <li class="list-group-item">Son Giriş: <span>03 Kasım 2024</span></li>
+                </ul>
+            </div>
+            <div class="mt-4">
+                <a href="/logout" class="btn btn-outline-danger btn-block">Çıkış Yap</a>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

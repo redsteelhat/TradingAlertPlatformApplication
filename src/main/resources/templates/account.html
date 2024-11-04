@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Hesap Bilgileri</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Trading Alert Platform</a>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <!-- Eğer kullanıcı giriş yaptıysa -->
+            <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                <a class="nav-link" href="/profile">Profile</a>
+            </li>
+            <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                <a class="nav-link" href="/notifications">Bildirimler</a>
+            </li>
+            <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                <form action="/logout" method="post">
+                    <button type="submit" class="btn btn-danger">Çıkış Yap</button>
+                </form>
+            </li>
+            <!-- Eğer kullanıcı giriş yapmadıysa -->
+            <li class="nav-item" th:if="${!#authorization.expression('isAuthenticated()')}">
+                <a class="nav-link" href="/auth/login">Giriş Yap</a>
+            </li>
+            <li class="nav-item" th:if="${!#authorization.expression('isAuthenticated()')}">
+                <a class="nav-link" href="/auth/register">Kayıt Ol</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container mt-5">
+    <h2 class="text-center">Binance Hesap Bilgileri</h2>
+
+    <div class="mt-4">
+        <h4>Bakiyeler</h4>
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>Varlık</th>
+                <th>Kullanılabilir Bakiye</th>
+                <th>Bloke Edilen Bakiye</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="balance : ${accountInfo['balances']}">
+                <td th:text="${balance['asset']}">BTC</td>
+                <td th:text="${balance['free']}">0.0</td>
+                <td th:text="${balance['locked']}">0.0</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="/logout" class="btn btn-danger">Çıkış Yap</a>
+    </div>
+</div>
+</body>
+</html>
