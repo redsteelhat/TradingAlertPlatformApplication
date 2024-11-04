@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Ana Sayfa</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Trading Alert Platform</a>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav ml-auto">
+      <!-- Eğer kullanıcı giriş yaptıysa -->
+      <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+        <a class="nav-link" href="/profile">Profile</a>
+      </li>
+      <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+        <a class="nav-link" href="/notifications">Bildirimler</a>
+      </li>
+      <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+        <form action="/logout" method="post">
+          <button type="submit" class="btn btn-danger">Çıkış Yap</button>
+        </form>
+      </li>
+      <!-- Eğer kullanıcı giriş yapmadıysa -->
+      <li class="nav-item" th:if="${!#authorization.expression('isAuthenticated()')}">
+        <a class="nav-link" href="/auth/login">Giriş Yap</a>
+      </li>
+      <li class="nav-item" th:if="${!#authorization.expression('isAuthenticated()')}">
+        <a class="nav-link" href="/auth/register">Kayıt Ol</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container mt-5" th:if="${#authorization.expression('isAuthenticated()')}">
+  <h1 class="text-center" th:text="'Hoşgeldiniz, ' + ${#authentication.principal.username} + '!'"></h1>
+  <p class="text-center">Bu platform, TradingView alarmlarınızı takip etmenize ve Binance üzerinde otomatik işlemler gerçekleştirmenize yardımcı olur.</p>
+  <div class="text-center mt-4">
+    <a class="btn btn-primary" th:href="@{/trades}">İşlemlerim</a>
+    <a class="btn btn-primary" th:href="@{/markets}">Piyasalar</a>
+    <a class="btn btn-primary" th:href="@{/settings}">Ayarlar</a>
+  </div>
+</div>
+
+<div class="container mt-5" th:if="${!#authorization.expression('isAuthenticated()')}">
+  <h1 class="text-center">Hoşgeldiniz!</h1>
+  <p class="text-center">Bu platform, TradingView alarmlarınızı takip etmenize ve Binance üzerinde otomatik işlemler gerçekleştirmenize yardımcı olur.</p>
+  <div class="text-center mt-4">
+    <a class="btn btn-primary" th:href="@{/auth/login}">Hızlı Başlayın</a>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
