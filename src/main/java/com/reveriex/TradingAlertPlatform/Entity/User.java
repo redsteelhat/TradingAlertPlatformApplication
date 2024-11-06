@@ -22,6 +22,9 @@ public class User {
     @Column
     private String role = "USER"; // Varsayılan rol
 
+    @Column(name = "profile_picture")
+    private String profilePicture; // Profil fotoğrafı dosya yolu
+
     // Getters ve Setters
     public Long getId() {
         return id;
@@ -61,5 +64,13 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 }

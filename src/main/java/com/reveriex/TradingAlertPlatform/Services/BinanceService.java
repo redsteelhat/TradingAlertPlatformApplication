@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 @Service
 public class BinanceService {
@@ -26,13 +26,12 @@ public class BinanceService {
     private final OkHttpClient client = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public Map<String, Object> getFormattedAccountInfo() throws Exception {
+    // Spot Bakiyesini Getir
+    public List<Map<String, String>> getSpotBalance() throws Exception {
         String url = "https://api.binance.com/api/v3/account";
-
         long timestamp = System.currentTimeMillis();
         String queryString = "timestamp=" + timestamp;
 
-        // İmza oluşturma
         String signature = BinanceUtil.generateSignature(queryString, apiSecret);
         queryString += "&signature=" + signature;
 
@@ -43,17 +42,11 @@ public class BinanceService {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) throw new Exception("Binance API hatası");
+            if (!response.isSuccessful()) throw new Exception("Binance Spot API hatası");
 
-            // Yanıtı JSON formatında işle
             JsonNode root = objectMapper.readTree(response.body().string());
-            Map<String, Object> accountInfo = new HashMap<>();
+            List<Map<String, String>> spotBalances = new ArrayList<>();
 
-            // Kullanıcı adı ve diğer hesap detayları
-            accountInfo.put("username", apiKey); // Binance kullanıcı adını API Key olarak belirtiyoruz
-
-            // Bakiyeler
-            List<Map<String, String>> balances = new ArrayList<>();
             for (JsonNode balanceNode : root.path("balances")) {
                 double availableBalance = balanceNode.path("free").asDouble();
                 double lockedBalance = balanceNode.path("locked").asDouble();
@@ -63,12 +56,47 @@ public class BinanceService {
                     balanceInfo.put("asset", balanceNode.path("asset").asText());
                     balanceInfo.put("free", String.valueOf(availableBalance));
                     balanceInfo.put("locked", String.valueOf(lockedBalance));
-                    balances.add(balanceInfo);
+                    spotBalances.add(balanceInfo);
                 }
             }
-            accountInfo.put("balances", balances);
+            return spotBalances;
+        }
+    }
 
-            return accountInfo;
+    // Futures Bakiyesini Getir
+    public List<Map<String, String>> getFuturesBalance() throws Exception {
+        String url = "https://fapi.binance.com/fapi/v2/account";
+        long timestamp = System.currentTimeMillis();
+        String queryString = "timestamp=" + timestamp;
+
+        String signature = BinanceUtil.generateSignature(queryString, apiSecret);
+        queryString += "&signature=" + signature;
+
+        Request request = new Request.Builder()
+                .url(url + "?" + queryString)
+                .get()
+                .addHeader("X-MBX-APIKEY", apiKey)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) throw new Exception("Binance Futures API hatası");
+
+            JsonNode root = objectMapper.readTree(response.body().string());
+            List<Map<String, String>> futuresBalances = new ArrayList<>();
+
+            for (JsonNode assetNode : root.path("assets")) {
+                double availableBalance = assetNode.path("availableBalance").asDouble();
+                double walletBalance = assetNode.path("walletBalance").asDouble();
+
+                if (walletBalance > 0) {
+                    Map<String, String> balanceInfo = new HashMap<>();
+                    balanceInfo.put("asset", assetNode.path("asset").asText());
+                    balanceInfo.put("availableBalance", String.valueOf(availableBalance));
+                    balanceInfo.put("walletBalance", String.valueOf(walletBalance));
+                    futuresBalances.add(balanceInfo);
+                }
+            }
+            return futuresBalances;
         }
     }
 }

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Binance Bakiyeler</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+  <h2>Binance Bakiyeler</h2>
+
+  <div th:if="${error}">
+    <p class="text-danger" th:text="${error}">Bir hata oluştu.</p>
+  </div>
+
+  <h3>Spot Bakiyeler</h3>
+  <table class="table table-bordered table-striped mt-3">
+    <thead>
+    <tr>
+      <th>Varlık</th>
+      <th>Kullanılabilir Bakiye</th>
+      <th>Bloke Edilen Bakiye</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="balance : ${spotBalances}">
+      <td th:text="${balance.asset}"></td>
+      <td th:text="${balance.free}"></td>
+      <td th:text="${balance.locked}"></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <h3>Futures Bakiyeler</h3>
+  <table class="table table-bordered table-striped mt-3">
+    <thead>
+    <tr>
+      <th>Varlık</th>
+      <th>Kullanılabilir Bakiye</th>
+      <th>Cüzdan Bakiyesi</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="balance : ${futuresBalances}">
+      <td th:text="${balance.asset}"></td>
+      <td th:text="${balance.availableBalance}"></td>
+      <td th:text="${balance.walletBalance}"></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

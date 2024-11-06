@@ -11,13 +11,13 @@
     <ul class="navbar-nav ml-auto">
       <!-- Eğer kullanıcı giriş yaptıysa -->
       <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
-        <a class="nav-link" href="/profile">Profile</a>
+        <a class="nav-link" href="/profile">Profil</a>
       </li>
       <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
         <a class="nav-link" href="/notifications">Bildirimler</a>
       </li>
       <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
-        <form action="/logout" method="post">
+        <form action="/logout" method="post" style="display:inline;">
           <button type="submit" class="btn btn-danger">Çıkış Yap</button>
         </form>
       </li>
@@ -35,6 +35,19 @@
 <div class="container mt-5" th:if="${#authorization.expression('isAuthenticated()')}">
   <h1 class="text-center" th:text="'Hoşgeldiniz, ' + ${#authentication.principal.username} + '!'"></h1>
   <p class="text-center">Bu platform, TradingView alarmlarınızı takip etmenize ve Binance üzerinde otomatik işlemler gerçekleştirmenize yardımcı olur.</p>
+
+  <h2 class="mt-4">TradingView Alarmlarınız:</h2>
+  <div id="alarms" class="mt-3">
+    <div th:if="${alarms.isEmpty()}" class="alert alert-warning" role="alert">
+      Henüz alarm yok.
+    </div>
+    <div th:each="alarm : ${alarms}">
+      <div class="alert alert-success" role="alert">
+        <strong th:text="${alarm.symbol}"></strong>: <span th:text="${alarm.action}"></span> at <span th:text="${alarm.price}"></span>
+      </div>
+    </div>
+  </div>
+
   <div class="text-center mt-4">
     <a class="btn btn-primary" th:href="@{/trades}">İşlemlerim</a>
     <a class="btn btn-primary" th:href="@{/markets}">Piyasalar</a>

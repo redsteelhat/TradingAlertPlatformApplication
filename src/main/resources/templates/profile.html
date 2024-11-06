@@ -1,33 +1,115 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Profile Page</title>
+    <meta charset="UTF-8">
+    <title>Profil Sayfası</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-<div class="container mt-5">
-    <div class="card mx-auto" style="width: 22rem;">
-        <img th:src="${profilePicture}" class="card-img-top rounded-circle mx-auto mt-3" alt="Profile Picture" style="width: 150px; height: 150px;">
-        <div class="card-body text-center">
-            <h3 class="card-title" th:text="${username}">Kullanıcı Adı</h3>
-            <p class="card-text">Bu, kullanıcı profil sayfasıdır. Burada profil bilgilerinizi görüntüleyebilir ve güncelleyebilirsiniz.</p>
-            <div class="btn-group mt-3" role="group">
-                <a href="/settings" class="btn btn-secondary">Ayarlar</a>
-                <a href="/binance/account" class="btn btn-primary">Binance Hesabı</a>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Trading Alert Platform</a>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                <a class="nav-link" href="/profile">Profil</a>
+            </li>
+            <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                <a class="nav-link" href="/notifications">Bildirimler</a>
+            </li>
+            <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                <form action="/logout" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Çıkış Yap</button>
+                </form>
+            </li>
+            <li class="nav-item" th:if="${!#authorization.expression('isAuthenticated()')}">
+                <a class="nav-link" href="/auth/login">Giriş Yap</a>
+            </li>
+            <li class="nav-item" th:if="${!#authorization.expression('isAuthenticated()')}">
+                <a class="nav-link" href="/auth/register">Kayıt Ol</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container mt-5" style="max-width: 900px;">
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Profil Dashboard</h4>
+
+            <!-- Genel Bilgiler Kartı -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Genel Bilgiler</h5>
+                    <p>Toplam İşlem Sayısı: <span th:text="${totalTrades}">120</span></p>
+                    <p>Kâr/Zarar Durumu: <span class="text-success" th:text="'$' + ${profitOrLoss}">$5300</span></p>
+                    <p>Binance Bağlantısı: <span th:if="${binanceConnected}" class="text-success">Aktif</span><span th:if="${!binanceConnected}" class="text-danger">Bağlantı Başarısız</span></p>
+                </div>
             </div>
-            <div class="mt-4">
-                <h5>İstatistikler</h5>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">Toplam İşlem Sayısı: <span>120</span></li>
-                    <li class="list-group-item">Kazanç: <span>$5300</span></li>
-                    <li class="list-group-item">Son Giriş: <span>03 Kasım 2024</span></li>
-                </ul>
+
+            <!-- Spot Bakiyeler Kartı -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Spot Bakiyeler</h5>
+                    <div th:each="balance : ${spotBalances}">
+                        <p>
+                            <strong th:text="${balance.asset}">USDT</strong>:
+                            <span th:text="${balance.free}">1000.0</span> (Kullanılabilir),
+                            <span th:text="${balance.locked}">0.0</span> (Bloke)
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div class="mt-4">
-                <a href="/logout" class="btn btn-outline-danger btn-block">Çıkış Yap</a>
+
+            <!-- Futures Bakiyeler Kartı -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Futures Bakiyeler</h5>
+                    <div th:each="balance : ${futuresBalances}">
+                        <p>
+                            <strong th:text="${balance.asset}">BTC</strong>:
+                            <span th:text="${balance.availableBalance}">1.5</span> (Kullanılabilir),
+                            <span th:text="${balance.walletBalance}">1.8</span> (Cüzdan Bakiyesi)
+                        </p>
+                    </div>
+                </div>
             </div>
+
+            <!-- Son Sinyaller Kartı -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Son Sinyaller</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" th:each="signal : ${recentSignals}">
+                            <strong th:text="${signal.type}">AL</strong> sinyali
+                            <span th:text="${signal.symbol}">BTCUSDT</span>
+                            için <span th:text="'$' + ${signal.price}">$50000</span> seviyesinde oluşturuldu.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Son İşlemler Kartı -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Son İşlemler</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" th:each="trade : ${recentTrades}">
+                            <strong th:text="${trade.type}">AL</strong> işlemi
+                            <span th:text="${trade.symbol}">BTCUSDT</span>
+                            için <span th:text="'$' + ${trade.price}">$50000</span> seviyesinde
+                            <span th:text="${trade.result}">kâr</span> ile sonuçlandı.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

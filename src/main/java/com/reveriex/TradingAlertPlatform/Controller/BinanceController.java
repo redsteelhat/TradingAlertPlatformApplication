@@ -2,15 +2,14 @@ package com.reveriex.TradingAlertPlatform.Controller;
 
 import com.reveriex.TradingAlertPlatform.Services.BinanceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.stereotype.Controller;
 
+import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/binance")
 public class BinanceController {
 
     private final BinanceService binanceService;
@@ -20,14 +19,16 @@ public class BinanceController {
         this.binanceService = binanceService;
     }
 
-    @GetMapping("/account")
-    public String getAccountInfo(Model model) {
+    @GetMapping("/binance/balance")
+    public String getBalances(Model model) {
         try {
-            Map<String, Object> accountInfo = binanceService.getFormattedAccountInfo();
-            model.addAttribute("accountInfo", accountInfo);
+            List<Map<String, String>> spotBalances = binanceService.getSpotBalance();
+            List<Map<String, String>> futuresBalances = binanceService.getFuturesBalance();
+            model.addAttribute("spotBalances", spotBalances);
+            model.addAttribute("futuresBalances", futuresBalances);
         } catch (Exception e) {
-            model.addAttribute("error", "Hesap bilgileri alınamadı: " + e.getMessage());
+            model.addAttribute("error", "Binance bakiyeleri alınamadı: " + e.getMessage());
         }
-        return "account";
+        return "balances";
     }
 }
